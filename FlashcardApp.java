@@ -15,7 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 
-import java.io.IOException;
+import java.io.*;
 
 /**
  * The GUI for the FlashcardApp using JavaFX.
@@ -85,6 +85,7 @@ public class FlashcardApp extends Application {
         Button deleteBtn = new Button("Delete");
         Button studyBtn = new Button("Study");
         Button exitBtn = new Button("Save & Exit");
+        Button createBtn = new Button("Create Deck");
 
         // TextFields
         TextField loadTF = new TextField();
@@ -100,6 +101,7 @@ public class FlashcardApp extends Application {
 
         // Actions for all buttons
         loadBtn.setOnAction(e -> {
+
             String dataFile = loadTF.getText();
 
             try {
@@ -111,7 +113,14 @@ public class FlashcardApp extends Application {
                 deckLV.getItems().addAll(deck.getFlashcardsList());
 
             } catch (IOException error) {
-                System.out.println(error.getMessage());
+
+                if (dataFile.isEmpty()) {
+                    deckName.setText("Please enter a file name");
+                } else {
+                    deckName.setText("File Not Found");
+                    mainTop.getChildren().add(createBtn);
+                }
+
             }
             
         });
@@ -147,6 +156,28 @@ public class FlashcardApp extends Application {
             studyStage();
         });
 
+        createBtn.setOnAction(e -> {
+
+            try {
+
+                String dataFile = loadTF.getText() + ".txt";
+
+                File newFile = new File(dataFile);
+                newFile.createNewFile();
+
+                PrintWriter inFile = new PrintWriter(newFile);
+                inFile.println("0");
+
+                mainTop.getChildren().remove(createBtn);
+
+                inFile.close();
+
+            } catch (IOException error) {
+                System.out.println(error.getMessage());
+            } 
+
+        });
+
         // Display the main window
         Scene scene = new Scene(root, 400, 500);
         stage.setScene(scene);
@@ -159,7 +190,6 @@ public class FlashcardApp extends Application {
      */
     public void addStage() {
 
-        // 
         Stage stage = new Stage();
         stage.setTitle("Add Flashcard");
 
